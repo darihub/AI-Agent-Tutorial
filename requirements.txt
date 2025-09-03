@@ -1,8 +1,9 @@
 langchain
 wikipedia
-langchain-openai
 langchain-community
-langchain-anthropic
 python-dotenv
 pydantic
 PyPDF2
+fastapi
+uvicorn
+gpt4all
