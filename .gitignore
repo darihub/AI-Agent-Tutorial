@@ -1,3 +1,4 @@
 .env
 docs/
 git_filter_repo.py
+venv/
