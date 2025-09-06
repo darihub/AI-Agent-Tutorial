@@ -1,10 +1,20 @@
+# Python
+import os
 from dotenv import load_dotenv
+# Pydantic
 from pydantic import BaseModel
-from langchain_openai import ChatOpenAI
+# Langchain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.agents import create_tool_calling_agent, AgentExecutor
-import PyPDF2
+from langchain_community.chat_models import GPT4All
+# GPT4All
+from gpt4all import GPT4All as GPT4AllModel
+
+# TODO: Change Agent's instructions to cover something else not related to the POS system.
+# Make it connect to Wikpedia API
+# Host GPT4All on a server and connect to it from here
+
 
 load_dotenv() # Load environment variables from a .env file
 
@@ -16,27 +26,18 @@ class ResearchResponse(BaseModel):
     sources: list[str]
     tools_used: list[str]
 
-llm = ChatOpenAI(model="gpt-4o-mini")
+
 parser = PydanticOutputParser(pydantic_object=ResearchResponse) # parses raw LLM output into structured ResearchResponse
 
-# Load documentation from PDF
-with open("docs/pos_docs.pdf", "rb") as doc_file:
-    reader = PyPDF2.PdfReader(doc_file)
-    documentation = ""
-    for page in reader.pages:
-        documentation += page.extract_text() or "" # Extract text from each page
-
+MODEL_PATH = os.getenv("MODEL_PATH")  # Update this path to your actual model file
+llm = GPT4All(MODEL_PATH) # local model instance
 
 prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             f"""
-            You are an assistant that helps the user utilize and navigate a POS system.
-            Respond either in Spanish or English, depending on the user's input.
-            You will assist according to the system's and other source's documentation.
-            Here is the documentation you should use:
-            {documentation}
+            You are a research assistant that answers questions based on Wikipedia.
             """
         ),
         ("placeholder", "{chat_history}"),
